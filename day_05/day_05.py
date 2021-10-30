@@ -1,9 +1,4 @@
-import typing
 import math
-
-T = typing.TypeVar("T")
-Compute = dict[str, T]
-Seat = (int, int)
 
 def from_file(path):
     boarding_passes = list()
@@ -39,7 +34,7 @@ def parse_seat(boarding_pass):
         compute.update(processing_letter(letter, compute))
     return (compute["rows_keeping"], compute["column_keeping"])
 
-def calculate_id(boarding_pass: str) -> int:
+def calculate_id(boarding_pass):
     (row, column) = parse_seat(boarding_pass)
     return row * 8 + column
 
