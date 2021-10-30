@@ -1,26 +1,30 @@
 import itertools
 import functools
 
-def new_entries(path: str) -> list[int]:
-    lines = open(path, "r").readlines()
-    return [int(line.strip()) for line in lines if line.strip().isnumeric()]
+def from_file(path):
+    entries = list()
+    with open(path, "r") as file:
+        parse_int = lambda string: int(string.strip())
+        entries = [parse_int(string) for string in file.readlines()]
+    return entries
 
-def product(values: list[int]) -> int:
-    return functools.reduce(lambda x, y: x * y, values)
+def product(items):
+    product = lambda x, y: x * y
+    return functools.reduce(product, items)
 
-def find_by_sum(entries: list[int], entries_to_sum: int, value: int) -> list[int]:
-    result: List[int] = list()
+def find_by_sum(entries, entries_to_sum = 2, value = 2020):
+    result = list()
     combinations = itertools.combinations(entries, entries_to_sum)
     for combination in combinations:
         if(sum(combination) == 2020):
-            result.append(product(list(combination)))
+            result.append(product(combination))
 
     return result
 
 if __name__ == "__main__":
-    entries = new_entries("input/day_01.txt")
-    [part_01] = find_by_sum(entries, 2, 2020)
+    entries = from_file("input/day_01.txt")
+    [part_01] = find_by_sum(entries)
     print("part_01:-", part_01)
 
-    [part_02] = find_by_sum(entries, 3, 2020)
+    [part_02] = find_by_sum(entries, entries_to_sum = 3)
     print("part_02:-", part_02)

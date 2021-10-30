@@ -1,6 +1,29 @@
-Answer = dict[str, int]
 
-def new_group(string: str, group: Answer = Answer()) -> Answer:
+def from_file(path):
+    with open(path, "r") as file:
+        groups = list({})
+        group_id = int()
+        group_size = 1
+
+        for string in file.readlines():
+            string = string.strip()
+            if(string == ''):
+                groups[group_id].update({"size": group_size})
+                group_size = 1
+                group_id += 1
+            elif((group_id + 1) != len(groups)):
+                groups.append(parse_group(string, dict()))
+            else:
+                group = groups[group_id]
+                parse_group(string, group)
+                group_size += 1
+        else:
+            groups[group_id].update({"size": group_size})
+
+        return groups
+
+
+def parse_group(string, group = dict()):
     for letter in string:
         if(letter not in group):
             group[letter] = 1
@@ -8,38 +31,16 @@ def new_group(string: str, group: Answer = Answer()) -> Answer:
             group[letter] += 1
     return group
 
-def new_groups(path: str) -> list[Answer]:
-    groups = list[Answer]({})
-    group_id = 0
-    group_size = 1
-    lines = [line.strip() for line in open(path, "r")]
-
-    for line in lines:
-        if(line == ''):
-            groups[group_id].update({"size": group_size})
-            group_size = 1
-            group_id += 1
-        elif((group_id + 1) != len(groups)):
-            groups.append(new_group(line, Answer()))
-        else:
-            group = groups[group_id]
-            new_group(line, group)
-            group_size += 1
-    else:
-        groups[group_id].update({"size": group_size})
-
-    return groups
-
-def count_anyone_yes(groups: list[Answer]) -> int:
-    count = 0
+def count_anyone_yes(groups):
+    count = int()
     for group in groups:
         for letter in group.keys():
             if(letter != "size"):
                 count += 1
     return count
 
-def count_everyone_yes(groups: list[Answer]) -> int:
-    count = 0
+def count_everyone_yes(groups):
+    count = int()
     for group in groups:
         for letter in group.keys():
             if(letter != "size"):
@@ -48,7 +49,7 @@ def count_everyone_yes(groups: list[Answer]) -> int:
     return count
 
 if __name__ == "__main__":
-    groups = new_groups("input/day_06.txt")
+    groups = from_file("input/day_06.txt")
     part_01 = count_anyone_yes(groups)
     print("part_01:-", part_01)
 

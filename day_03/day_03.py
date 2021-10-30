@@ -1,27 +1,26 @@
-import typing
 
-T = typing.TypeVar("T")
-Steps = dict[str, T]
+def from_file(path):
+    grid = list()
+    with open(path, "r") as file:
+        grid = [string.strip() for string in file.readlines()]
 
-def new_grid(path: str) -> list[str]:
-    lines = open(path, "r").readlines()
-    return [line.strip() for line in lines]
+    return grid
 
-def simulate(grid: list[str], steps: Steps, three: int = 0) -> int:
+def simulate(grid, steps, three = int()):
     if(steps["y"] >= len(grid)):
         return three
     else:
         (new_steps, new_three) = processing_row(grid[steps["y"]], steps, three)
         return simulate(grid, new_steps, new_three)
 
-def simulate_by_steps_list(grid: list[str], steps_list: list[Steps]) -> int:
+def simulate_by_steps_list(grid, steps_list):
     product = 1
     for steps in steps_list:
         product *= simulate(grid, steps)
 
     return product
 
-def processing_row(row: str, steps: Steps, three: int) -> (Steps, int):
+def processing_row(row, steps, three):
     x = steps["x"]
     row_size = len(row)
     steps["x"] += steps["right"]
@@ -34,7 +33,7 @@ def processing_row(row: str, steps: Steps, three: int) -> (Steps, int):
         new_three = count_three(new_row[x], three)
         return (new_steps, new_three)
 
-def repeat_row(row: str, steps: Steps) -> (Steps, str):
+def repeat_row(row, steps):
     new_row = row * steps["repeat"]
     if(len(new_row) > steps["x"]):
         return (steps, new_row)
@@ -42,14 +41,14 @@ def repeat_row(row: str, steps: Steps) -> (Steps, str):
         steps["repeat"] += 2
         return repeat_row(new_row, steps)
 
-def count_three(item: str, three: int) -> int:
+def count_three(item, three):
     if(item == "#"):
         three += 1
 
     return three
 
 if __name__ == "__main__":
-    grid = new_grid("input/day_03.txt")
+    grid = from_file("input/day_03.txt")
     part_01_steps = {"right": 3, "down": 1, "x": 0, "y": 0, "repeat": 2}
     part_01 = simulate(grid, part_01_steps)
     print("part_01:-", part_01)

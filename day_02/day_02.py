@@ -1,37 +1,34 @@
-import typing
-import re
 
-T = typing.TypeVar("T")
-Password = dict[str, T]
-regex = re.compile("^\d+\-\d+\s\w:\s\w*$")
+def from_file(path):
+    passwords = list()
+    with open(path, "r") as file:
+        passwords = [parse_password(string) for string in file.readlines()]
 
-def new_password(string: str) -> Password:
-    password = dict[str, T]()
-    if(regex.search(string)):
-        [string_range, character, plain] = string.replace(":", "").split(" ")
-        password["range"] = tuple([int(item) for item in string_range.split("-")])
-        password["character"]  = character
-        password["plain"] = plain
+    return passwords
+
+def parse_password(string):
+    password = dict()
+    parse_int = lambda string: int(string)
+    [string_range, character, plain] = string.replace(":", "").split(" ")
+    password["range"] = tuple([parse_int(string) for string in string_range.split("-")])
+    password["character"] = character
+    password["plain"] = plain
 
     return password
 
-def new_passwords(path: str) -> list[Password]:
-    lines = open(path, "r").readlines()
-    return [new_password(line.strip()) for line in lines]
-
-def default_policy(password: Password) -> bool:
+def default_policy(password):
     count = password["plain"].count(password["character"])
     (count_min, count_max) = password["range"]
     return (count >= count_min) and (count <= count_max)
     
-def new_policy(password: Password) -> bool:
+def new_policy(password):
     (begin, end) = password["range"]
     character = password["character"]
     plain = password["plain"]
     return (plain[begin-1] == character) ^ (plain[end-1] == character)
 
-def count_by_policy(passwords: list[Password], policy: typing.Callable[Password, bool]) -> int:
-    valid_passwords = 0
+def count_by_policy(passwords, policy = default_policy):
+    valid_passwords = int()
     for password in passwords:
         if(policy(password)):
             valid_passwords += 1
@@ -39,8 +36,8 @@ def count_by_policy(passwords: list[Password], policy: typing.Callable[Password,
     return valid_passwords
 
 if __name__ == "__main__":
-    passwords = new_passwords("input/day_02.txt")
-    part_01 = count_by_policy(passwords, default_policy)
+    passwords = from_file("input/day_02.txt")
+    part_01 = count_by_policy(passwords)
     print("part_01:-", part_01)
 
     part_02 = count_by_policy(passwords, new_policy)
